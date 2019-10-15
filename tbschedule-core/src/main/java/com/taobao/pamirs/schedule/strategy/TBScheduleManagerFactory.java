@@ -187,11 +187,18 @@ public class TBScheduleManagerFactory implements ApplicationContextAware {
 
     public void reRegisterManagerFactory() throws Exception {
         // 重新分配调度器
+        // 根据UUID（IP+$+HostName+$+UUID+$Sequence），在/factory目录下查找对应目录，有则跳过，无则创建
+        // 并在/strategy目录下根据IP数组，确定可管理的strategyName下创建（IP+$+HostName+$+UUID+$Sequence）目录，
+        // 返回不可管理的调度策略类型名称，并停止对应的调度处理器
         List<String> stopList = this.getScheduleStrategyManager().registerManagerFactory(this);
         for (String strategyName : stopList) {
             this.stopServer(strategyName);
         }
+        //根据策略重新分配调度任务机器的任务数，并在zk上更新对应的ScheduleStrategyRunntime中的AssignNum
         this.assignScheduleServer();
+        //注意，一个strategyName下只有唯一表示当前调度服务器的节点（IP+$+HostName+$+UUID+$Sequence）
+        //同时一个strategyName对应该调度服务器多个IStrategyTask任务管理器，一个taskItem对应一个任务管理器
+        //多则删停，少则加起
         this.reRunScheduleServer();
     }
 
