@@ -123,6 +123,7 @@ class TBScheduleProcessorSleep<T> implements IScheduleProcessor, Runnable {
 
         Object[] result = null;
         if (size > 0) {
+            // 动态初始化 指定长度、指定类型的数组
             result = (Object[]) Array.newInstance(this.taskList.get(0).getClass(), size);
         }
         for (int i = 0; i < size; i++) {
