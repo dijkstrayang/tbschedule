@@ -42,6 +42,12 @@ public class ScheduleStrategyDataManager4ZK {
         }
     }
 
+    /**
+     * /rootPath/strategy/strategyName 获取调度策略信息
+     * @param strategyName 调度策略名称
+     * @return
+     * @throws Exception
+     */
     public ScheduleStrategy loadStrategy(String strategyName) throws Exception {
         String zkPath = this.PATH_Strategy + "/" + strategyName;
         if (this.getZooKeeper().exists(zkPath, false) == null) {
@@ -98,9 +104,15 @@ public class ScheduleStrategyDataManager4ZK {
         ZKTools.deleteTree(this.getZooKeeper(), zkPath);
     }
 
+    /**
+     * 遍历 /rootPath/strategy的子节点 ，查询所有调度策略的信息
+     * @return
+     * @throws Exception
+     */
     public List<ScheduleStrategy> loadAllScheduleStrategy() throws Exception {
         String zkPath = this.PATH_Strategy;
         List<ScheduleStrategy> result = new ArrayList<>();
+        // 子节点 存储 调度策略
         List<String> names = this.getZooKeeper().getChildren(zkPath, false);
         Collections.sort(names);
         for (String name : names) {
@@ -116,6 +128,11 @@ public class ScheduleStrategyDataManager4ZK {
      */
     public List<String> registerManagerFactory(TBScheduleManagerFactory managerFactory) throws Exception {
 
+        /**
+         *  向rootPath/factory目录下注册当前调度服务器 同时设置到managerFactory中
+         *
+         *  uuid = ip$hostname$UUID$sequence
+         */
         if (managerFactory.getUuid() == null) {
             String uuid =
                 managerFactory.getIp() + "$" + managerFactory.getHostName() + "$" + UUID.randomUUID().toString()
@@ -131,9 +148,12 @@ public class ScheduleStrategyDataManager4ZK {
         }
 
         List<String> result = new ArrayList<>();
+        // 查询所有调度策略
         for (ScheduleStrategy scheduleStrategy : loadAllScheduleStrategy()) {
             boolean isFind = false;
 
+            // 如果当前调度策略没有暂定，且分配ip包含当前调度服务器IP 则
+            // 到/rootPath/strategy/strategyName/ 注册子节点/rootPath/strategy/strategyName/managerFactory的uuid
             if (ScheduleStrategy.STS_PAUSE.equalsIgnoreCase(scheduleStrategy.getSts()) == false
                 && scheduleStrategy.getIPList() != null) {
                 for (String ip : scheduleStrategy.getIPList()) {
@@ -152,7 +172,7 @@ public class ScheduleStrategyDataManager4ZK {
                     }
                 }
             }
-            // 暂停或者不在IP范围，清除原来注册的Factory
+            // 暂停或者不在IP范围，清除原来注册的Factory，并返回不再管理的调度策略类型名称
             if (isFind == false) {
                 String zkPath =
                     this.PATH_Strategy + "/" + scheduleStrategy.getStrategyName() + "/" + managerFactory.getUuid();
@@ -177,6 +197,13 @@ public class ScheduleStrategyDataManager4ZK {
         }
     }
 
+    /**
+     * 从/rootPath/strategy/strategyName/managerFactoryUUID获取调度策略运行时信息
+     * @param strategyName
+     * @param uuid
+     * @return
+     * @throws Exception
+     */
     public ScheduleStrategyRunntime loadScheduleStrategyRunntime(String strategyName, String uuid) throws Exception {
         String zkPath = this.PATH_Strategy + "/" + strategyName + "/" + uuid;
         ScheduleStrategyRunntime result = null;
@@ -194,6 +221,7 @@ public class ScheduleStrategyDataManager4ZK {
                 if (null == result.getUuid()) {
                     throw new Exception("gson 反序列化异常,uuid为null");
                 }
+            // 如果存储的信息为空 则新建
             } else {
                 result = new ScheduleStrategyRunntime();
                 result.setStrategyName(strategyName);
@@ -219,6 +247,14 @@ public class ScheduleStrategyDataManager4ZK {
         return result;
     }
 
+    /**
+     * 遍历 /rootPath/strategy子节点，查询所有调度策略。
+     * 判断 /rootPath/strategy/strategyName/managerFactoryUUID 是否存在
+     * 如果存在获取其存储的调度策略运行时信息
+     * @param managerFactoryUUID
+     * @return
+     * @throws Exception
+     */
     public List<ScheduleStrategyRunntime> loadAllScheduleStrategyRunntimeByUUID(String managerFactoryUUID)
         throws Exception {
         List<ScheduleStrategyRunntime> result = new ArrayList<>();
@@ -234,6 +270,13 @@ public class ScheduleStrategyDataManager4ZK {
         return result;
     }
 
+    /**
+     * 先获取/rootPath/strategy/strategyName的子节点 即该调度策略下的所有调度服务器uuid
+     * 然后从 /rootPath/strategy/strategyName/manegerFactoryUUID 获取调度策略运行时信息
+     * @param strategyName
+     * @return
+     * @throws Exception
+     */
     public List<ScheduleStrategyRunntime> loadAllScheduleStrategyRunntimeByTaskType(String strategyName)
         throws Exception {
         List<ScheduleStrategyRunntime> result = new ArrayList<>();
@@ -251,6 +294,7 @@ public class ScheduleStrategyDataManager4ZK {
         });
 
         for (String uuid : uuidList) {
+            // 从/rootPath/strategy/strategyName/managerFactoryUUID获取调度策略运行时信息
             result.add(loadScheduleStrategyRunntime(strategyName, uuid));
         }
         return result;
@@ -258,6 +302,7 @@ public class ScheduleStrategyDataManager4ZK {
 
     /**
      * 更新请求数量
+     * /rootPath/strategy/strategyName/manegerFactoryUUID
      */
     public void updateStrategyRunntimeReqestNum(String strategyName, String manangerFactoryUUID, int requestNum)
         throws Exception {

@@ -85,8 +85,9 @@ public class ScheduleUtil {
      * 分配任务数量 即根据Strategy的配置为所有ManagerFactory，指定需要创建的线程组个数
      *
      * @param serverNum 总的服务器数量 可以分配的ManagerFactory总数
-     * @param taskItemNum 任务项数量 配置线程组总数
+     * @param taskItemNum 任务项数量，配置线程组总数
      * @param maxNumOfOneServer 每个server最大任务项数目 单jvm最大线程组数量
+     * @return int[] 每个调度服务器上 用于的线程组的数量
      */
     public static int[] assignTaskNumber(int serverNum, int taskItemNum, int maxNumOfOneServer) {
         int[] taskNums = new int[serverNum];
