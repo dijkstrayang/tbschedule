@@ -206,26 +206,32 @@ public class TBScheduleManagerFactory implements ApplicationContextAware {
      * 根据策略重新分配调度任务的机器
      */
     public void assignScheduleServer() throws Exception {
+        //根据当前ManagerFactory的UUID，去strategy目录下获取匹配的所有调度策略运行信息
         for (ScheduleStrategyRunntime run : this.scheduleStrategyManager
             .loadAllScheduleStrategyRunntimeByUUID(this.uuid)) {
+            //根据策略名获取获取当前策略下所有的ManagerFactory
             List<ScheduleStrategyRunntime> factoryList = this.scheduleStrategyManager
                 .loadAllScheduleStrategyRunntimeByTaskType(run.getStrategyName());
+            //如果当前ManagerFactory在当前调度策略下的所有的ManagerFactory中不为leader，没有分配权
             if (factoryList.size() == 0 || this.isLeader(this.uuid, factoryList) == false) {
                 continue;
             }
+            //获取配置的策略信息
             ScheduleStrategy scheduleStrategy = this.scheduleStrategyManager.loadStrategy(run.getStrategyName());
-
+            //根据配置的任务项，进行线程组分配。传入参数：ManagerFactory个数、最大线程组数目、单jvm最大线程组数
             int[] nums = ScheduleUtil.assignTaskNumber(factoryList.size(), scheduleStrategy.getAssignNum(),
                 scheduleStrategy.getNumOfSingleServer());
             for (int i = 0; i < factoryList.size(); i++) {
                 ScheduleStrategyRunntime factory = factoryList.get(i);
                 // 更新请求的服务器数量
+                //将分配后结果写入到ZK中，等待其他ManagerFactory轮询获取 //更新请求的服务器数量
                 this.scheduleStrategyManager
                     .updateStrategyRunntimeReqestNum(run.getStrategyName(), factory.getUuid(), nums[i]);
             }
         }
     }
 
+    //所有ManagerFactory中UUID最小的为leader
     public boolean isLeader(String uuid, List<ScheduleStrategyRunntime> factoryList) {
         try {
             long no = Long.parseLong(uuid.substring(uuid.lastIndexOf("$") + 1));
