@@ -335,6 +335,12 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager {
 
     }
 
+    /**
+     * 从 /rootPath/baseTaskType 获取调度任务类型相关信息
+     * @param baseTaskType
+     * @return
+     * @throws Exception
+     */
     @Override
     public ScheduleTaskType loadTaskTypeBaseInfo(String baseTaskType) throws Exception {
         String zkPath = this.PATH_BaseTaskType + "/" + baseTaskType;
@@ -517,6 +523,15 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager {
         return this.getZooKeeper().getChildren(zkPath, false).size();
     }
 
+    /**
+     * 清除已经过期的OWN_SIGN的自动生成的数据
+     * /rootPath/baseTaskType
+     * /rootPath/baseTaskType/baseTaskType1/taskItem
+     * @param baseTaskType 任务类型
+     * @param serverUUID 服务器
+     * @param expireDateInternal 过期时间，以天为单位
+     * @throws Exception
+     */
     @Override
     public void clearExpireTaskTypeRunningInfo(String baseTaskType, String serverUUID, double expireDateInternal)
         throws Exception {
@@ -831,21 +846,33 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager {
         }
     }
 
+    /**
+     * 注册调度服务器
+     * @param server
+     * @throws Exception
+     */
     @Override
     public void registerScheduleServer(ScheduleServer server) throws Exception {
         if (server.isRegister() == true) {
             throw new Exception(server.getUuid() + " 被重复注册");
         }
+        /**
+         * /rootPath/baseTaskType/baseTaskType1/taskType1
+         */
         String zkPath = this.PATH_BaseTaskType + "/" + server.getBaseTaskType() + "/" + server.getTaskType();
         if (this.getZooKeeper().exists(zkPath, false) == null) {
             this.getZooKeeper().create(zkPath, null, this.zkManager.getAcl(), CreateMode.PERSISTENT);
         }
+        /**
+         * /rootPath/baseTaskType/baseTaskType1/taskType1/server
+         */
         zkPath = zkPath + "/" + this.PATH_Server;
         if (this.getZooKeeper().exists(zkPath, false) == null) {
             this.getZooKeeper().create(zkPath, null, this.zkManager.getAcl(), CreateMode.PERSISTENT);
         }
         String realPath = null;
         // 此处必须增加UUID作为唯一性保障
+        // /rootPath/baseTaskType/baseTaskType1/taskType1/server/taskType1$ip$uuid$
         String zkServerPath =
             zkPath + "/" + server.getTaskType() + "$" + server.getIp() + "$" + (UUID.randomUUID().toString()
                 .replaceAll("-", "").toUpperCase()) + "$";

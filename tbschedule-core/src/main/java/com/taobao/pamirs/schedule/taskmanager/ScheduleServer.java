@@ -73,6 +73,9 @@ public class ScheduleServer {
      */
     private long version;
 
+    /**
+     * 是否已经被注册
+     */
     private boolean isRegister;
 
     private String managerFactoryUUID;
