@@ -26,8 +26,10 @@ public class TBScheduleManagerStatic extends TBScheduleManager {
     }
 
     public void initialRunningInfo() throws Exception {
+        // 清除已经过期的调度服务器信息
         scheduleCenter.clearExpireScheduleServer(this.currenScheduleServer.getTaskType(),
             this.taskTypeInfo.getJudgeDeadInterval());
+        // 根据任务类型 加载 该任务下所有调度服务器
         List<String> list = scheduleCenter.loadScheduleServerNames(this.currenScheduleServer.getTaskType());
         if (scheduleCenter.isLeader(this.currenScheduleServer.getUuid(), list)) {
             // 是第一次启动，先清楚所有的垃圾数据

@@ -115,6 +115,9 @@ public class TBScheduleManagerFactory implements ApplicationContextAware
 			}
 			this.zkManager = new ZKManager(p);
 			this.errorMessage = "Zookeeper connecting ......" + this.zkManager.getConnectStr();
+			/**
+			 * 开启一个线程 进行异步初始化
+			 */
 			initialThread = new InitialThread(this);
 			initialThread.setName("TBScheduleManagerFactory-initialThread");
 			initialThread.start();
@@ -131,7 +134,9 @@ public class TBScheduleManagerFactory implements ApplicationContextAware
 	public void initialData() throws Exception
 	{
 		this.zkManager.initial();
+		// 初始化调度配置中心客户端
 		this.scheduleDataManager = new ScheduleDataManager4ZK(this.zkManager);
+		// 调度策略管理器
 		this.scheduleStrategyManager = new ScheduleStrategyDataManager4ZK(this.zkManager);
 		if (this.start == true)
 		{
@@ -150,7 +155,7 @@ public class TBScheduleManagerFactory implements ApplicationContextAware
 	}
 
 	/**
-	 * 创建调度任务分配器
+	 * 创建调度任务分配器 - 线程组
 	 */
 	public IStrategyTask createStrategyTask(ScheduleStrategy strategy)
 	{
@@ -248,7 +253,7 @@ public class TBScheduleManagerFactory implements ApplicationContextAware
 	}
 
 	/**
-	 * 根据策略重新分配调度任务的机器：主要更新每个调度服务器下分担的线程组数量
+	 * 根据策略重新分配调度服务器：主要更新每个调度管理器下分担的线程组数量
 	 */
 	public void assignScheduleServer() throws Exception
 	{
@@ -256,7 +261,7 @@ public class TBScheduleManagerFactory implements ApplicationContextAware
 		for (ScheduleStrategyRunntime run : this.scheduleStrategyManager
 				.loadAllScheduleStrategyRunntimeByUUID(this.uuid))
 		{
-			//根据策略名获取获取当前策略下所有的调度服务器ManagerFactory的调度策略运行信息
+			//根据策略名获取获取当前策略下所有的调度管理器的调度策略运行信息
 			List<ScheduleStrategyRunntime> factoryList = this.scheduleStrategyManager
 					.loadAllScheduleStrategyRunntimeByTaskType(run.getStrategyName());
 			//如果当前ManagerFactory在当前调度策略下的所有的ManagerFactory中不为leader，没有分配权

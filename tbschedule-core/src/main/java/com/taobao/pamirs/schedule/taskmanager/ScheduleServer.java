@@ -15,6 +15,7 @@ public class ScheduleServer {
 
     /**
      * 全局唯一编号
+     * taskType1$ip$uuid$
      */
     private String uuid;
     private long id;

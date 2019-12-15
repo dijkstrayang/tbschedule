@@ -25,6 +25,8 @@ public class ScheduleStrategyDataManager4ZK {
 
     /**
      * 在Spring对象创建完毕后，创建内部对象
+     *  PATH_Strategy /rootpath/strategy
+     * PATH_ManagerFactory /rootpath/factory
      */
     public ScheduleStrategyDataManager4ZK(ZKManager aZkManager) throws Exception {
         this.zkManager = aZkManager;
@@ -138,6 +140,7 @@ public class ScheduleStrategyDataManager4ZK {
                 managerFactory.getIp() + "$" + managerFactory.getHostName() + "$" + UUID.randomUUID().toString()
                     .replaceAll("-", "").toUpperCase();
             String zkPath = this.PATH_ManagerFactory + "/" + uuid + "$";
+            //rootPath/factory/uuid
             zkPath = this.getZooKeeper().create(zkPath, null, this.zkManager.getAcl(), CreateMode.EPHEMERAL_SEQUENTIAL);
             managerFactory.setUuid(zkPath.substring(zkPath.lastIndexOf("/") + 1));
         } else {
@@ -152,7 +155,7 @@ public class ScheduleStrategyDataManager4ZK {
         for (ScheduleStrategy scheduleStrategy : loadAllScheduleStrategy()) {
             boolean isFind = false;
 
-            // 如果当前调度策略没有暂定，且分配ip包含当前调度服务器IP 则
+            // 如果当前调度策略没有暂定，且分配ip包含当前调度管理器IP 则
             // 到/rootPath/strategy/strategyName/ 注册子节点/rootPath/strategy/strategyName/managerFactory的uuid
             if (ScheduleStrategy.STS_PAUSE.equalsIgnoreCase(scheduleStrategy.getSts()) == false
                 && scheduleStrategy.getIPList() != null) {
@@ -187,6 +190,8 @@ public class ScheduleStrategyDataManager4ZK {
 
     /**
      * 注销服务，停止调度
+     * 遍历/rootpath/strategy所有子节点
+     * 如果/rootpath/strategy/strategyname/uuid存在 则进行删除
      */
     public void unRregisterManagerFactory(TBScheduleManagerFactory managerFactory) throws Exception {
         for (String taskName : this.getZooKeeper().getChildren(this.PATH_Strategy, false)) {
@@ -271,7 +276,7 @@ public class ScheduleStrategyDataManager4ZK {
     }
 
     /**
-     * 先获取/rootPath/strategy/strategyName的子节点 即该调度策略下的所有调度服务器uuid
+     * 先获取/rootPath/strategy/strategyName的子节点 即该调度策略下的所有调度管理器uuid
      * 然后从 /rootPath/strategy/strategyName/manegerFactoryUUID 获取调度策略运行时信息
      * @param strategyName
      * @return
@@ -350,6 +355,12 @@ public class ScheduleStrategyDataManager4ZK {
         this.getZooKeeper().setData(zkPath, Boolean.toString(isStart).getBytes(), -1);
     }
 
+    /**
+     * 从/rootpath/factory/uuid 加载调度管理器的信息
+     * @param uuid
+     * @return
+     * @throws Exception
+     */
     public ManagerFactoryInfo loadManagerFactoryInfo(String uuid) throws Exception {
         String zkPath = this.PATH_ManagerFactory + "/" + uuid;
         if (this.getZooKeeper().exists(zkPath, false) == null) {
