@@ -182,13 +182,21 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager {
 
     }
 
+    /**
+     * 通过taskType获取当前运行的serverList信息
+     * @param taskType
+     * @return
+     * @throws Exception
+     */
     @Override
     public Map<String, Stat> getCurrentServerStatList(String taskType) throws Exception {
         Map<String, Stat> statMap = new HashMap<String, Stat>();
         String baseTaskType = ScheduleUtil.splitBaseTaskTypeFromTaskType(taskType);
+        // /rootpath/baseTaskType/baseTaskType1/taskType1/server
         String zkPath = this.PATH_BaseTaskType + "/" + baseTaskType + "/" + taskType + "/" + this.PATH_Server;
         List<String> childs = this.getZooKeeper().getChildren(zkPath, false);
         for (String serv : childs) {
+            // /rootpath/baseTaskType/baseTaskType1/taskType1/server/server1
             String singleServ = zkPath + "/" + serv;
             Stat servStat = this.getZooKeeper().exists(singleServ, false);
             statMap.put(serv, servStat);
