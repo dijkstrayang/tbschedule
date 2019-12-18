@@ -60,7 +60,7 @@ public class ScheduleTaskType implements java.io.Serializable {
      */
     private String permitRunStartTime;
     /**
-     * 允许执行的开始时间
+     * 允许执行的结束时间
      */
     private String permitRunEndTime;
 
@@ -92,7 +92,7 @@ public class ScheduleTaskType implements java.io.Serializable {
     private String[] taskItems;
 
     /**
-     * 每个线程组能处理的最大任务项目书目
+     * 每个线程组能处理的最大任务项数目
      */
     private int maxTaskItemsOfOneThreadGroup = 0;
     /**

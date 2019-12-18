@@ -33,7 +33,7 @@ public interface IScheduleDataManager {
     public void releaseDealTaskItem(String taskType, String uuid) throws Exception;
 
     /**
-     * 获取一共任务类型的处理队列数量
+     * 获取指定任务类型的处理队列数量
      */
     public int queryTaskItemCount(String taskType) throws Exception;
 
@@ -159,6 +159,13 @@ public interface IScheduleDataManager {
      */
     public boolean isInitialRunningInfoSucuss(String baseTaskType, String ownSign) throws Exception;
 
+    /**
+     * 设置 运行期信息初始化成功
+     * @param baseTaskType
+     * @param taskType
+     * @param uuid
+     * @throws Exception
+     */
     public void setInitialRunningInfoSucuss(String baseTaskType, String taskType, String uuid) throws Exception;
 
     public String getLeader(List<String> serverList);

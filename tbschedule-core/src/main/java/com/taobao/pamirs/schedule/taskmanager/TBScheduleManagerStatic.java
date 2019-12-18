@@ -12,7 +12,7 @@ public class TBScheduleManagerStatic extends TBScheduleManager {
 
     private static transient Logger log = LoggerFactory.getLogger(TBScheduleManagerStatic.class);
     /**
-     * 总的任务数量
+     * 总的任务项数量
      */
     protected int taskItemCount = 0;
 
@@ -101,8 +101,8 @@ public class TBScheduleManagerStatic extends TBScheduleManager {
     }
 
     /**
-     * 定时向数据配置中心更新当前服务器的心跳信息。 如果发现本次更新的时间如果已经超过了，
-     * 服务器死亡的心跳周期，则不能在向服务器更新信息。 而应该当作新的服务器，进行重新注册。
+     * 定时向数据配置中心更新当前调度服务器的信息。
+     * 如果发现本次更新的时间如果已经超过了，服务器死亡的心跳周期，则不能在向服务器更新信息，而应该当作新的服务器，进行重新注册。
      */
     @Override
     public void refreshScheduleServerInfo() throws Exception {
@@ -175,15 +175,20 @@ public class TBScheduleManagerStatic extends TBScheduleManager {
      * 3、清除已经超过心跳周期的服务器注册信息
      * 4、重新计算任务分配
      * 5、更新任务状态的版本号【乐观锁】
-     * 6、根系任务队列的分配信息
+     * 6、更新任务队列的分配信息
      * </p>
      */
     @Override
     public void assignScheduleTask() throws Exception {
+        // 清除已经过期的调度服务器信息
+        // 遍历 /rootpath/baseTaskType/<baseTasktype>/<taskType>/server子节点
         scheduleCenter.clearExpireScheduleServer(this.currenScheduleServer.getTaskType(),
             this.taskTypeInfo.getJudgeDeadInterval());
+        //  根据任务类型 加载 该任务下所有调度服务器
+        // /rootptah/baseTaskType/<baseTasktype>/<taskType>/server
         List<String> serverList = scheduleCenter.loadScheduleServerNames(this.currenScheduleServer.getTaskType());
 
+        // uuid最小的是leader
         if (scheduleCenter.isLeader(this.currenScheduleServer.getUuid(), serverList) == false) {
             if (log.isDebugEnabled()) {
                 log.debug(this.currenScheduleServer.getUuid() + ":不是负责任务分配的Leader,直接返回");
@@ -191,8 +196,10 @@ public class TBScheduleManagerStatic extends TBScheduleManager {
             return;
         }
         // 设置初始化成功标准，避免在leader转换的时候，新增的线程组初始化失败
+        // rootptah/baseTaskType/<baseTaskType>/<taskType>/taskItem 写入leader的uuid
         scheduleCenter.setInitialRunningInfoSucuss(this.currenScheduleServer.getBaseTaskType(),
             this.currenScheduleServer.getTaskType(), this.currenScheduleServer.getUuid());
+        // 清除任务信息，服务器已经不存在的时候
         scheduleCenter.clearTaskItem(this.currenScheduleServer.getTaskType(), serverList);
         scheduleCenter
             .assignTaskItem(this.currenScheduleServer.getTaskType(), this.currenScheduleServer.getUuid(),
@@ -231,6 +238,7 @@ public class TBScheduleManagerStatic extends TBScheduleManager {
     }
 
     /**
+     * 加载当前处理任务队列清单
      * 由于上面在数据执行时有使用到synchronized ，但是心跳线程并没有对应加锁。
      * 所以在此方法上加一下synchronized。
      */
@@ -258,6 +266,7 @@ public class TBScheduleManagerStatic extends TBScheduleManager {
             // 重新查询当前服务器能够处理的队列
             // 为了避免在休眠切换的过程中出现队列瞬间的不一致，先清除内存中的队列
             this.currentTaskItemList.clear();
+            // 重新装载当前server需要处理的数据队列
             this.currentTaskItemList = this.scheduleCenter
                 .reloadDealTaskItem(this.currenScheduleServer.getTaskType(), this.currenScheduleServer.getUuid());
 

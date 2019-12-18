@@ -78,6 +78,9 @@ abstract class TBScheduleManager implements IStrategyTask
 	 * 最近一起重新装载调度任务的时间。 当前实际 - 上次装载时间 > intervalReloadTaskItemList，则向配置中心请求最新的任务分配情况
 	 */
 	protected long lastReloadTaskItemListTime = 0;
+	/**
+	 * 是否需要重新装载任务项
+	 */
 	protected boolean isNeedReloadTaskItem = true;
 
 	private String mBeanName;
@@ -213,6 +216,13 @@ abstract class TBScheduleManager implements IStrategyTask
 
 	}
 
+	/**
+	 * 刷新调度服务器的相关信息
+	 * /rootpath/baseTaskType/<baseTaskType>/<taskType>/server/taskType1$ip$uuid$
+	 * 如果节点不存在，重新注册
+	 * 如果已存在，则更新心跳和版本号
+	 * @throws Exception
+	 */
 	public void rewriteScheduleInfo() throws Exception
 	{
 		registerLock.lock();
