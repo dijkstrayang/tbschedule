@@ -729,6 +729,7 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager {
     public List<ScheduleServer> selectAllValidScheduleServer(String taskType) throws Exception {
         List<ScheduleServer> result = new ArrayList<ScheduleServer>();
         String baseTaskType = ScheduleUtil.splitBaseTaskTypeFromTaskType(taskType);
+        // /rootPath/baseTaskType/<baseTaskType>/<taskType>/server
         String zkPath = this.PATH_BaseTaskType + "/" + baseTaskType + "/" + taskType + "/" + this.PATH_Server;
         if (this.getZooKeeper().exists(zkPath, false) == null) {
             return result;
