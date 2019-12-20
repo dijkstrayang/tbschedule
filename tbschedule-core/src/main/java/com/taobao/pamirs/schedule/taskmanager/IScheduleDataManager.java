@@ -88,6 +88,12 @@ public interface IScheduleDataManager
 
 	/**
 	 * 重新分配任务Item
+	 * 遍历 /rootPath/baseTaskType/<baseTaskType>/<taskType>/taskItem子节点，将所有任务项分配给调度服务器集合
+	 * /rootPath/baseTaskType/<baseTaskType>/<taskType>/taskItem/<taskItem>/cur_server
+	 * /rootPath/baseTaskType/<baseTaskType>/<taskType>/taskItem/<taskItem>/req_server
+	 * 如果发生改变
+	 * 则设置的调度任务的加载标识 reload=true
+	 * /rootPath/baseTaskType/<baseTaskType>/<taskType>/server
 	 */
 	public void assignTaskItem(String taskType, String currentUuid, int maxNumOfOneServer, List<String> serverList)
 			throws Exception;
@@ -142,25 +148,37 @@ public interface IScheduleDataManager
 
 	/**
 	 * 清除一个任务类型的运行期信息
+	 * 删除/rootPath/baseTaskType/<baseTaskType>子节点
 	 */
 	public void clearTaskType(String baseTaskType) throws Exception;
 
 	/**
 	 * 创建一个新的任务类型
+	 * 创建/rootPath/baseTaskType/<baseTaskType>
+	 * value：ScheduleTaskType（调度任务类型）
 	 */
 	public void createBaseTaskType(ScheduleTaskType baseTaskType) throws Exception;
 
     /**
-     *
+     * 修改一个任务类型
+	 * 修改 /rootPath/baseTaskType/<baseTaskType>
      * @param baseTaskType
      * @throws Exception
      */
 	public void updateBaseTaskType(ScheduleTaskType baseTaskType) throws Exception;
 
+	/**
+	 * 根据baseTaskType 查询所有调度任务运行时信息
+	 * 遍历/rootPath/baseTaskType/<baseTaskType>
+	 * @param baseTaskType
+	 * @return
+	 * @throws Exception
+	 */
 	public List<ScheduleTaskTypeRunningInfo> getAllTaskTypeRunningInfo(String baseTaskType) throws Exception;
 
 	/**
 	 * 删除一个任务类型
+	 * 删除删除/rootPath/baseTaskType/<baseTaskType>节点
 	 */
 	public void deleteTaskType(String baseTaskType) throws Exception;
 
