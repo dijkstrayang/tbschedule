@@ -183,7 +183,19 @@ public interface IScheduleDataManager
 	public void deleteTaskType(String baseTaskType) throws Exception;
 
 	/**
-	 * 根据条件查询当前调度服务
+	 * 根据条件查询 有效的服务器信息
+	 * baseTaskType 原始任务类型 可为空
+	 * ownSign 环境信息 可为空
+	 *
+	 * baseTaskType、ownSign都不为空的时候, 查询 查询 /rootPath/baseTaskType/<baseTaskType>/<baseTaskType$ownSign>/server下的调度服务器
+	 *
+	 * baseTaskType不为空、ownSign为空的时候  /rootPath/baseTaskType/<baseTaskType>/<baseTaskType$*>/server下所有调度服务器
+	 *
+	 * baseTaskType为空、ownSign不为空的时候 /rootPath/baseTaskType/<*>/<*$ownSign>/server
+	 *
+	 * 两者都为空的时候 /rootPath/baseTaskType/<*>/<*>/server
+	 *
+	 * 调用selectAllValidScheduleServer(String taskType) 遍历 /rootPath/baseTaskType/<baseTaskType>/<taskType>/server
 	 */
 	public List<ScheduleServer> selectScheduleServer(String baseTaskType, String ownSign, String ip, String orderStr)
 			throws Exception;
