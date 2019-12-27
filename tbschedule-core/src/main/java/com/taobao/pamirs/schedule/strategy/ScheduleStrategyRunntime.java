@@ -2,113 +2,146 @@ package com.taobao.pamirs.schedule.strategy;
 
 import com.taobao.pamirs.schedule.strategy.ScheduleStrategy.Kind;
 
-public class ScheduleStrategyRunntime {
+public class ScheduleStrategyRunntime
+{
 
-    /**
-     * 任务类型
-     */
-    String strategyName;
-    String uuid;
-    String ip;
+	/**
+	 * 策略名称
+	 */
+	String strategyName;
 
-    private Kind kind;
+	/**
+	 * uuid
+	 */
+	String uuid;
 
-    /**
-     * Schedule Name,Class Name、Bean Name
-     */
-    private String taskName;
+	/**
+	 * ip
+	 */
+	String ip;
 
-    private String taskParameter;
+	/**
+	 * 任务类型,可选类型：Schedule,Java,Bean 大小写敏感
+	 */
+	private Kind kind;
 
-    /**
-     * 需要的任务数量
-     */
-    int requestNum;
-    /**
-     * 当前的任务数量
-     */
-    int currentNum;
+	/**
+	 * 任务名称：与任务类型匹配的名称例如：1、任务管理中配置的任务名称(对应Schedule) 2、Class名称(对应java) 3、Bean的名称(对应Bean)
+	 */
+	private String taskName;
 
-    String message;
+	/**
+	 * 任务参数:逗号分隔的Key-Value。 对任务类型为Schedule的无效，需要通过任务管理来配置的
+	 */
+	private String taskParameter;
 
-    public String getMessage() {
-        return message;
-    }
+	/**
+	 * 需要的任务数量
+	 */
+	int requestNum;
+	/**
+	 * 当前的任务数量
+	 */
+	int currentNum;
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
+	String message;
 
-    public String getUuid() {
-        return uuid;
-    }
+	public String getMessage()
+	{
+		return message;
+	}
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
+	public void setMessage(String message)
+	{
+		this.message = message;
+	}
 
-    public String getIp() {
-        return ip;
-    }
+	public String getUuid()
+	{
+		return uuid;
+	}
 
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
+	public void setUuid(String uuid)
+	{
+		this.uuid = uuid;
+	}
 
-    public String getStrategyName() {
-        return strategyName;
-    }
+	public String getIp()
+	{
+		return ip;
+	}
 
-    public void setStrategyName(String strategyName) {
-        this.strategyName = strategyName;
-    }
+	public void setIp(String ip)
+	{
+		this.ip = ip;
+	}
 
-    public Kind getKind() {
-        return kind;
-    }
+	public String getStrategyName()
+	{
+		return strategyName;
+	}
 
-    public void setKind(Kind kind) {
-        this.kind = kind;
-    }
+	public void setStrategyName(String strategyName)
+	{
+		this.strategyName = strategyName;
+	}
 
-    public String getTaskName() {
-        return taskName;
-    }
+	public Kind getKind()
+	{
+		return kind;
+	}
 
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
-    }
+	public void setKind(Kind kind)
+	{
+		this.kind = kind;
+	}
 
-    public String getTaskParameter() {
-        return taskParameter;
-    }
+	public String getTaskName()
+	{
+		return taskName;
+	}
 
-    public void setTaskParameter(String taskParameter) {
-        this.taskParameter = taskParameter;
-    }
+	public void setTaskName(String taskName)
+	{
+		this.taskName = taskName;
+	}
 
-    public int getRequestNum() {
-        return requestNum;
-    }
+	public String getTaskParameter()
+	{
+		return taskParameter;
+	}
 
-    public void setRequestNum(int requestNum) {
-        this.requestNum = requestNum;
-    }
+	public void setTaskParameter(String taskParameter)
+	{
+		this.taskParameter = taskParameter;
+	}
 
-    public int getCurrentNum() {
-        return currentNum;
-    }
+	public int getRequestNum()
+	{
+		return requestNum;
+	}
 
-    public void setCurrentNum(int currentNum) {
-        this.currentNum = currentNum;
-    }
+	public void setRequestNum(int requestNum)
+	{
+		this.requestNum = requestNum;
+	}
 
-    @Override
-    public String toString() {
-        return "ScheduleStrategyRunntime [strategyName=" + strategyName + ", uuid=" + uuid + ", ip=" + ip + ", kind="
-            + kind + ", taskName=" + taskName + ", taskParameter="
-            + taskParameter + ", requestNum=" + requestNum + ", currentNum=" + currentNum + ", message=" + message
-            + "]";
-    }
+	public int getCurrentNum()
+	{
+		return currentNum;
+	}
+
+	public void setCurrentNum(int currentNum)
+	{
+		this.currentNum = currentNum;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "ScheduleStrategyRunntime [strategyName=" + strategyName + ", uuid=" + uuid + ", ip=" + ip + ", kind="
+				+ kind + ", taskName=" + taskName + ", taskParameter=" + taskParameter + ", requestNum=" + requestNum
+				+ ", currentNum=" + currentNum + ", message=" + message + "]";
+	}
 
 }
