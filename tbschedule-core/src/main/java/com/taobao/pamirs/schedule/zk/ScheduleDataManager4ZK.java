@@ -57,7 +57,7 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager
 	 *
 	 *
 	 * /rootpath/baseTaskType
-	 * /rootpath/systime
+	 * /rootpath/systime 临时顺序节点，创建后删除，主要为获取zk的服务器时间
 	 *
 	 * @param aZkManager
 	 * @throws Exception
@@ -187,7 +187,7 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager
 	{
 		String taskType = ScheduleUtil.getTaskTypeByBaseAndOwnSign(baseTaskType, ownSign);
 		String leader = this.getLeader(this.loadScheduleServerNames(taskType));
-		// rootptah/baseTaskType/baseTaskType1/taskType1/taskItem 写入leader的uuid
+		// rootptah/baseTaskType/<baseTaskType>/<taskType>/taskItem 写入了leader的uuid
 		String zkPath = this.PATH_BaseTaskType + "/" + baseTaskType + "/" + taskType + "/" + this.PATH_TaskItem;
 		if (this.getZooKeeper().exists(zkPath, false) != null)
 		{
@@ -713,7 +713,7 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager
 	public int queryTaskItemCount(String taskType) throws Exception
 	{
 		String baseTaskType = ScheduleUtil.splitBaseTaskTypeFromTaskType(taskType);
-		// rootptah/baseTaskType/<baseTaskType>/<taskType>/taskItem 的子节点
+		// /rootPath/baseTaskType/<baseTaskType>/<taskType>/taskItem 的子节点
 		String zkPath = this.PATH_BaseTaskType + "/" + baseTaskType + "/" + taskType + "/" + this.PATH_TaskItem;
 		return this.getZooKeeper().getChildren(zkPath, false).size();
 	}
@@ -835,7 +835,7 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager
 
 	/**
 	 *  根据任务类型 加载 该任务下所有调度服务器
-	 *  /rootptah/baseTaskType/baseTaskType1/taskType1/server的子节点
+	 *  /rootptah/baseTaskType/<baseTaskType>/<taskType>/server的子节点
 	 * @param taskType
 	 * @return
 	 * @throws Exception
@@ -1037,6 +1037,7 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager
 				}
 			}
 		});
+		// 记录未修改的数量
 		int unModifyCount = 0;
 		int[] taskNums = ScheduleUtil.assignTaskNumber(taskServerList.size(), children.size(), maxNumOfOneServer);
 		int point = 0;
@@ -1058,16 +1059,19 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager
 			byte[] curServerValue = this.getZooKeeper().getData(zkPath + "/" + name + "/cur_server", false, null);
 			byte[] reqServerValue = this.getZooKeeper().getData(zkPath + "/" + name + "/req_server", false, null);
 
+			// 第一种情况：当前任务项没有分配过任务处理器
 			if (curServerValue == null || new String(curServerValue).equals(NO_SERVER_DEAL))
 			{
 				this.getZooKeeper().setData(zkPath + "/" + name + "/cur_server", serverName.getBytes(), -1);
 				this.getZooKeeper().setData(zkPath + "/" + name + "/req_server", null, -1);
 			}
+			// 第二种情况：持有当前任务项的任务处理器即为自己，且没有任务处理器申请
 			else if (new String(curServerValue).equals(serverName) == true && reqServerValue == null)
 			{
 				// 不需要做任何事情
 				unModifyCount = unModifyCount + 1;
 			}
+			// 第三种情况：持有当前任务项的是其他任务处理器，则设置申请此任务队列的是自己
 			else
 			{
 				this.getZooKeeper().setData(zkPath + "/" + name + "/req_server", serverName.getBytes(), -1);
@@ -1077,7 +1081,7 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager
 		if (unModifyCount < children.size())
 		{ // 设置需要所有的服务器重新装载任务
 			log.info("设置需要所有的服务器重新装载任务:updateReloadTaskItemFlag......" + taskType + "  ,currentUuid " + currentUuid);
-
+			// /rootPath/baseTaskType/<baseTaskType>/<taskType>/server 设置为true
 			this.updateReloadTaskItemFlag(taskType);
 		}
 		if (log.isDebugEnabled())

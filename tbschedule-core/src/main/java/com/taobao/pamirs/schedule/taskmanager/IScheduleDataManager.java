@@ -16,7 +16,7 @@ public interface IScheduleDataManager
 {
 
 	/**
-	 * 获取当前系统时间，以初始调度中心客户端的时候，zk服务器时间为基准
+	 * 获取当前系统时间，以初始调度中心客户端的时候zk服务器时间为基准
 	 * zkBaseTime + (sysdate - loclaBaseTime)
 	 * @return
 	 */
@@ -70,7 +70,7 @@ public interface IScheduleDataManager
 
 	/**
 	 * 清除任务信息，服务器已经不存在的时候
-	 * 如果 /rootPath/baseTaskType/<baseTaskType>/<taskType>/taskItem/<taskItem>/cur_server的值 不在serverList中
+	 * 如果 /rootPath/baseTaskType/<baseTaskType>/<taskType>/taskItem/<taskItem>/cur_server的值 不在serverList中 将该path的值设置为null
 	 */
 	public int clearTaskItem(String taskType, List<String> serverList) throws Exception;
 
@@ -82,7 +82,7 @@ public interface IScheduleDataManager
 
 	/**
 	 *  根据任务类型 加载 该任务下所有调度服务器
-	 *  /rootptah/baseTaskType/baseTaskType1/taskType1/server的子节点
+	 *  /rootptah/baseTaskType/<baseTaskType>/<taskType>/server的子节点
 	 */
 	public List<String> loadScheduleServerNames(String taskType) throws Exception;
 
@@ -233,14 +233,16 @@ public interface IScheduleDataManager
 
 	/**
 	 * 运行期信息是否初始化成功
+	 * 判断/rootptah/baseTaskType/<baseTaskType>/<taskType>/taskItem写入的数据是否和当前调度任务的leader服务器相同
 	 */
 	public boolean isInitialRunningInfoSucuss(String baseTaskType, String ownSign) throws Exception;
 
 	/**
 	 * 设置 运行期信息初始化成功
-	 * @param baseTaskType
-	 * @param taskType
-	 * @param uuid
+	 * /rootptah/baseTaskType/<baseTaskType>/<taskType>/taskItem 写入leader的uuid
+	 * @param baseTaskType 原始任务类型
+	 * @param taskType 任务类型
+	 * @param uuid leader uuid
 	 * @throws Exception
 	 */
 	public void setInitialRunningInfoSucuss(String baseTaskType, String taskType, String uuid) throws Exception;

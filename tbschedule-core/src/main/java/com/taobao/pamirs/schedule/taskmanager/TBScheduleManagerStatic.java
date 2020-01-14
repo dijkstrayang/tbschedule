@@ -201,6 +201,7 @@ public class TBScheduleManagerStatic extends TBScheduleManager {
             this.currenScheduleServer.getTaskType(), this.currenScheduleServer.getUuid());
         // 清除任务信息，服务器已经不存在的时候
         scheduleCenter.clearTaskItem(this.currenScheduleServer.getTaskType(), serverList);
+        // 重新分配任务Item
         scheduleCenter
             .assignTaskItem(this.currenScheduleServer.getTaskType(), this.currenScheduleServer.getUuid(),
                 this.taskTypeInfo.getMaxTaskItemsOfOneThreadGroup(), serverList);

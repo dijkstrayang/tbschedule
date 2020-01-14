@@ -89,6 +89,9 @@ abstract class TBScheduleManager implements IStrategyTask
 	 */
 	private Timer heartBeatTimer;
 
+	/**
+	 * 调度配置中心
+	 */
 	protected IScheduleDataManager scheduleCenter;
 
 	protected String startErrorInfo = null;

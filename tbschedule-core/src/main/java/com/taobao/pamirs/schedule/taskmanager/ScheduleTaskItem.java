@@ -54,11 +54,11 @@ public class ScheduleTaskItem {
      */
     private String taskItem;
     /**
-     * 持有当前任务队列的任务处理器
+     * 持有当前任务队列的任务处理器（线程组）
      */
     private String currentScheduleServer;
     /**
-     * 正在申请此任务队列的任务处理器
+     * 正在申请此任务队列的任务处理器（线程组）
      */
     private String requestScheduleServer;
 
