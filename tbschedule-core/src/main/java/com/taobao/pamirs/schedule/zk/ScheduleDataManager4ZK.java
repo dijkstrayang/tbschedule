@@ -901,11 +901,15 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager
 	public List<ScheduleServer> selectScheduleServerByManagerFactoryUUID(String factoryUUID) throws Exception
 	{
 		List<ScheduleServer> result = new ArrayList<ScheduleServer>();
+		// /rootpath/baseTaskType的子节点
 		for (String baseTaskType : this.getZooKeeper().getChildren(this.PATH_BaseTaskType, false))
 		{
+		    // /rootpath/baseTaskType/<baseTaskType> 的子节点
 			for (String taskType : this.getZooKeeper().getChildren(this.PATH_BaseTaskType + "/" + baseTaskType, false))
 			{
-				String zkPath = this.PATH_BaseTaskType + "/" + baseTaskType + "/" + taskType + "/" + this.PATH_Server;
+                // /rootpath/baseTaskType/<baseTaskType>/<taskType>/server 的子节点
+                String zkPath = this.PATH_BaseTaskType + "/" + baseTaskType + "/" + taskType + "/" + this.PATH_Server;
+                // /rootpath/baseTaskType/<baseTaskType>/<taskType>/server/<factoryUUID>
 				for (String uuid : this.getZooKeeper().getChildren(zkPath, false))
 				{
 					String valueString = new String(this.getZooKeeper().getData(zkPath + "/" + uuid, false, null));

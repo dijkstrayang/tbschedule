@@ -75,7 +75,7 @@ public interface IScheduleDataManager
 	public int clearTaskItem(String taskType, List<String> serverList) throws Exception;
 
 	/**
-	 * 获取所有的有效服务器信息
+	 * 获取某个调度任务类型下所有的有效服务器信息
      * 遍历 /rootPath/baseTaskType/<baseTaskType>/<taskType>/server
 	 */
 	public List<ScheduleServer> selectAllValidScheduleServer(String taskType) throws Exception;
@@ -206,6 +206,12 @@ public interface IScheduleDataManager
 	public List<ScheduleServer> selectHistoryScheduleServer(String baseTaskType, String ownSign, String ip,
 			String orderStr) throws Exception;
 
+	/**
+	 * 根据调度管理器（可以理解Wie机器？？？）查询运行于其上所有调度服务器
+	 * @param factoryUUID
+	 * @return
+	 * @throws Exception
+	 */
 	public List<ScheduleServer> selectScheduleServerByManagerFactoryUUID(String factoryUUID) throws Exception;
 
 	/**
