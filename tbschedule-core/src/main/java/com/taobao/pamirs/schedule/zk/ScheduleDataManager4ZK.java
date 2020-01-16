@@ -149,7 +149,7 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager
 
 		String taskType = ScheduleUtil.getTaskTypeByBaseAndOwnSign(baseTaskType, ownSign);
 		// 清除所有的老信息，只有leader能执行此操作
-		// rootpath/baseTaskType/baseTaskType1/taskTyp1/taskItem
+		// rootpath/baseTaskType/<baseTaskType>/<taskTyp>/taskItem
 		String zkPath = this.PATH_BaseTaskType + "/" + baseTaskType + "/" + taskType + "/" + this.PATH_TaskItem;
 		try
 		{
@@ -166,7 +166,7 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager
 				ZKTools.deleteTree(this.getZooKeeper(), zkPath);
 			}
 		}
-		// 创建目录 rootpath/baseTaskType/baseTaskType1/taskTyp1/taskItem
+		// 创建目录 rootpath/baseTaskType/<baseTaskType>/<taskTyp>/taskItem
 		this.getZooKeeper().create(zkPath, null, this.zkManager.getAcl(), CreateMode.PERSISTENT);
 		// 创建静态任务
 		this.createScheduleTaskItem(baseTaskType, ownSign, this.loadTaskTypeBaseInfo(baseTaskType).getTaskItems());
@@ -357,6 +357,7 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager
 	public void deleteScheduleTaskItem(String taskType, String taskItem) throws Exception
 	{
 		String baseTaskType = ScheduleUtil.splitBaseTaskTypeFromTaskType(taskType);
+		//
 		String zkPath = this.PATH_BaseTaskType + "/" + baseTaskType + "/" + taskType + "/" + this.PATH_TaskItem + "/"
 				+ taskItem;
 		ZKTools.deleteTree(this.getZooKeeper(), zkPath);

@@ -226,7 +226,7 @@ public interface IScheduleDataManager
 			String message) throws Exception;
 
 	/**
-	 * 删除任务项
+	 * 删除任务项 /rootpath/baseTaskType/<baseTaskType>/<taskType>/tasktItem/<taskItem>
 	 */
 	public void deleteScheduleTaskItem(String taskType, String taskItem) throws Exception;
 
