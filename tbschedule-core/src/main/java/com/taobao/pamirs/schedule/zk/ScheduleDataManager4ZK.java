@@ -1113,7 +1113,7 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager
 			throw new Exception(server.getUuid() + " 被重复注册");
 		}
 		/**
-		 * /rootPath/baseTaskType/baseTaskType1/taskType1
+		 * /rootPath/baseTaskType/<baseTaskType>/<taskType>
 		 */
 		String zkPath = this.PATH_BaseTaskType + "/" + server.getBaseTaskType() + "/" + server.getTaskType();
 		if (this.getZooKeeper().exists(zkPath, false) == null)
@@ -1121,7 +1121,7 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager
 			this.getZooKeeper().create(zkPath, null, this.zkManager.getAcl(), CreateMode.PERSISTENT);
 		}
 		/**
-		 * /rootPath/baseTaskType/baseTaskType1/taskType1/server
+		 * /rootPath/baseTaskType/<baseTaskType>/<taskType>/server
 		 */
 		zkPath = zkPath + "/" + this.PATH_Server;
 		if (this.getZooKeeper().exists(zkPath, false) == null)
@@ -1130,7 +1130,7 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager
 		}
 		String realPath = null;
 		// 此处必须增加UUID作为唯一性保障
-		// /rootPath/baseTaskType/baseTaskType1/taskType1/server/taskType1$ip$uuid$
+		// /rootPath/baseTaskType/<baseTaskType>/<taskType>/server/<taskType$ip$uuid$>
 		String zkServerPath = zkPath + "/" + server.getTaskType() + "$" + server.getIp() + "$"
 				+ (UUID.randomUUID().toString().replaceAll("-", "").toUpperCase()) + "$";
 		realPath = this.getZooKeeper().create(zkServerPath, null, this.zkManager.getAcl(),

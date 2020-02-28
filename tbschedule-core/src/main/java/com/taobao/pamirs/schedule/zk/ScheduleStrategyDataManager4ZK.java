@@ -156,7 +156,7 @@ public class ScheduleStrategyDataManager4ZK {
             boolean isFind = false;
 
             // 如果当前调度策略没有暂定，且分配ip包含当前调度管理器IP 则
-            // 到/rootPath/strategy/strategyName/ 注册子节点/rootPath/strategy/strategyName/managerFactory的uuid
+            // 到/rootPath/strategy/strategyName/ 注册子节点/rootPath/strategy/<strategyName>/<managerFactory的uuid>
             if (ScheduleStrategy.STS_PAUSE.equalsIgnoreCase(scheduleStrategy.getSts()) == false
                 && scheduleStrategy.getIPList() != null) {
                 for (String ip : scheduleStrategy.getIPList()) {

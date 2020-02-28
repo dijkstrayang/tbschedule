@@ -1,23 +1,31 @@
 package com.taobao.pamirs.schedule.strategy;
 
-public class ManagerFactoryInfo {
+/**
+ * 任务处理机信息
+ */
+public class ManagerFactoryInfo
+{
 
-    private String uuid;
-    private boolean start;
+	private String uuid;
+	private boolean start;
 
-    public void setStart(boolean start) {
-        this.start = start;
-    }
+	public void setStart(boolean start)
+	{
+		this.start = start;
+	}
 
-    public boolean isStart() {
-        return start;
-    }
+	public boolean isStart()
+	{
+		return start;
+	}
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
+	public void setUuid(String uuid)
+	{
+		this.uuid = uuid;
+	}
 
-    public String getUuid() {
-        return uuid;
-    }
+	public String getUuid()
+	{
+		return uuid;
+	}
 }
